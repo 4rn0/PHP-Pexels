@@ -25,7 +25,7 @@
          * @var    string
          * @access protected
          */
-        protected $_base = 'https://api.pexels.com/v1/search';
+        protected $_base = 'https://api.pexels.com/v1/';
 
         /**
          * _key
@@ -67,7 +67,7 @@
          * @param  boolean $associative (default: true)
          * @return void
          */
-        public function __construct($key, $associative = true)
+        public function __construct($key, $associative = false)
         {
             $this->_key = $key;
             $this->_associative = $associative;
@@ -80,7 +80,7 @@
          * @param  array $args
          * @return false|array|stdClass
          */
-        public function _get(array $args)
+        public function _get(string $path = 'search', array $args)
         {
             // Auth
             $context = stream_context_create(array(
@@ -92,7 +92,7 @@
             ));
 
             // Build the query
-            $path = http_build_query($args);
+            $path .= http_build_query($args);
             $url = ($this->_base) . '?' . ($path);
             $response = file_get_contents($url, false, $context);
             $headers = $http_response_header;
@@ -159,14 +159,14 @@
         }
 
         /**
-         * query
+         * search
          * 
          * @access public
          * @param  string $query
          * @param  array $args (default: array())
          * @return false|array|stdClass
          */
-        public function query($query, array $args = array())
+        public function search($query, array $args = array())
         {
             $args = array_merge(
                 array(
@@ -177,7 +177,7 @@
                 ),
                 $args
             );
-            $response = $this->_get($args);
+            $response = $this->_get('search', $args);
             if ($response === false) {
                 return false;
             }
@@ -195,6 +195,35 @@
             return $response;
         }
 
+
+        /**
+         * popular
+         * 
+         * @access public
+         * @param  array $args (default: array())
+         * @return false|array|stdClass
+         */
+        public function popular(array $args = array())
+        {
+            $args = array_merge(
+                array(
+                    'size' => 1,
+                    'page' => $this->_page,
+                    'per_page' => $this->_photosPerPage
+                ),
+                $args
+            );
+
+            $response = $this->_get('popular', $args);
+
+            if ($response === false) {
+                return false;
+            }
+
+            return $response;
+
+        }
+        
         /**
          * setPage
          * 
