@@ -77,10 +77,11 @@
          * _get
          * 
          * @access protected
+         * @param  string $path
          * @param  array $args
          * @return false|array|stdClass
          */
-        public function _get(string $path = 'search', array $args)
+        public function _get($path, array $args)
         {
             // Auth
             $context = stream_context_create(array(
@@ -92,8 +93,8 @@
             ));
 
             // Build the query
-            $path .= http_build_query($args);
-            $url = ($this->_base) . '?' . ($path);
+            $query = http_build_query($args);
+            $url = ($this->_base) . $path . '?' . ($query);
             $response = file_get_contents($url, false, $context);
             $headers = $http_response_header;
             $this->_limits = $this->_getRateLimits($http_response_header);
